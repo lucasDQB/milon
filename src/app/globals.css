@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-padding-top: env(safe-area-inset-top, 0px);
+  }
+  body {
+    @apply bg-bg text-ink font-body;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-panel border border-line rounded-card;
+  }
+  .btn-primary {
+    @apply w-full py-4 rounded-2xl bg-accent text-[#0B0D12] font-bold text-[15px] active:opacity-85;
+  }
+  .btn-ghost {
+    @apply w-full py-4 rounded-2xl border border-line text-ink font-semibold text-[15px] active:opacity-85;
+  }
+  .input-field {
+    @apply w-full bg-panel2 border border-line rounded-lg px-3 py-2 text-ink text-sm text-center;
+  }
+}
