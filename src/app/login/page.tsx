@@ -12,21 +12,42 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [confirmationSent, setConfirmationSent] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const { error } =
-      mode === "in"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
+    if (mode === "in") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setLoading(false);
 
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+      return;
+    }
+
+    // mode === "up"
+    const { data, error } = await supabase.auth.signUp({ email, password });
     setLoading(false);
 
     if (error) {
       setError(error.message);
+      return;
+    }
+
+    // If "Confirm email" is enabled in Supabase, signUp succeeds but returns
+    // no session until the user clicks the confirmation link. Show a
+    // "check your email" message instead of redirecting into a session
+    // that doesn't exist yet.
+    if (!data.session) {
+      setConfirmationSent(true);
       return;
     }
 
@@ -45,6 +66,23 @@ export default function LoginPage() {
         </p>
       </div>
 
+      {confirmationSent ? (
+        <div className="space-y-3 text-center">
+          <p className="text-sm text-ink">
+            Check <span className="font-medium">{email}</span> for a
+            confirmation link to finish creating your account.
+          </p>
+          <button
+            onClick={() => {
+              setConfirmationSent(false);
+              setMode("in");
+            }}
+            className="text-sm text-sub underline"
+          >
+            Back to sign in
+          </button>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="space-y-3">
         <input
           type="email"
@@ -70,15 +108,18 @@ export default function LoginPage() {
           {loading ? "Please wait…" : mode === "in" ? "Sign In" : "Sign Up"}
         </button>
       </form>
+      )}
 
-      <button
-        onClick={() => setMode(mode === "in" ? "up" : "in")}
-        className="mt-5 text-center text-sm text-sub"
-      >
-        {mode === "in"
-          ? "No account yet? Sign up"
-          : "Already have an account? Sign in"}
-      </button>
+      {!confirmationSent && (
+        <button
+          onClick={() => setMode(mode === "in" ? "up" : "in")}
+          className="mt-5 text-center text-sm text-sub"
+        >
+          {mode === "in"
+            ? "No account yet? Sign up"
+            : "Already have an account? Sign in"}
+        </button>
+      )}
     </div>
   );
 }
