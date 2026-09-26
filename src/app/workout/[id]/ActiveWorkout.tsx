@@ -45,7 +45,19 @@ export default function ActiveWorkout({
     if (!error && data) {
       setWorkout((w) => ({
         ...w,
-        workout_exercises: [...w.workout_exercises, { ...data, workout_id: w.id, user_id: userData.user!.id }],
+        workout_exercises: [
+          ...w.workout_exercises,
+          {
+            ...data,
+            workout_id: w.id,
+            user_id: userData.user!.id,
+            sets: data.sets.map((s: any) => ({
+              ...s,
+              workout_exercise_id: data.id,
+              user_id: userData.user!.id,
+            })),
+          },
+        ],
       }));
       setNewExercise("");
     }
