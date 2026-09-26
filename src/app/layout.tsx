@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Milon",
-  description: "The Progressive Overlaod App.",
+  description: "The Progressive Overload App.",
 };
 
 export const viewport = {
